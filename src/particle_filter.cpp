@@ -120,14 +120,26 @@ void ParticleFilter::dataAssociation(vector<LandmarkObs> predicted,
    *   probably find it useful to implement this method and use it as a helper
    *   during the updateWeights phase.
    */
-
+   for (int i = 0; i < observations.size(); i++) {
+     int closest_landmark = -1;
+     int min_dist = 999999;
+     int curr_dist;
+     for (int j = 0; j < predicted.size(); j++) {
+       curr_dist = dist(predicted[j].x, predicted[j].y, observations[i].x, observations[i].y);
+       if (curr_dist < min_dist) {
+         min_dist = curr_dist;
+         closest_landmark = predicted[j].id;
+       }
+     }
+     observations[i].id = closest_landmark;
+   }
 }
 
 void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
                                    const vector<LandmarkObs> &observations,
                                    const Map &map_landmarks) {
   /**
-   * TODO: Update the weights of each particle using a mult-variate Gaussian
+   * TODO: Update the weights of each particle using a multi-variate Gaussian
    *   distribution. You can read more about this distribution here:
    *   https://en.wikipedia.org/wiki/Multivariate_normal_distribution
    * NOTE: The observations are given in the VEHICLE'S coordinate system.
