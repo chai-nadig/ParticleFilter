@@ -42,7 +42,7 @@ struct ground_truth {
  * Struct representing one landmark observation measurement.
  */
 struct LandmarkObs {
-  
+
   int id;     // Id of matching landmark in the map.
   double x;   // Local (vehicle coords) x position of landmark observation [m]
   double y;   // Local (vehicle coords) y position of landmark observation [m]
@@ -89,7 +89,7 @@ inline bool read_map_data(std::string filename, Map& map) {
   if (!in_file_map) {
     return false;
   }
-  
+
   // Declare single line of map file
   std::string line_map;
 
@@ -126,7 +126,7 @@ inline bool read_map_data(std::string filename, Map& map) {
  * @param filename Name of file containing control measurements.
  * @output True if opening and reading file was successful
  */
-inline bool read_control_data(std::string filename, 
+inline bool read_control_data(std::string filename,
                               std::vector<control_s>& position_meas) {
   // Get file of position measurements
   std::ifstream in_file_pos(filename.c_str(),std::ifstream::in);
@@ -152,7 +152,7 @@ inline bool read_control_data(std::string filename,
     //read data from line to values:
     iss_pos >> velocity;
     iss_pos >> yawrate;
-    
+
     // Set values
     meas.velocity = velocity;
     meas.yawrate = yawrate;
@@ -188,7 +188,7 @@ inline bool read_gt_data(std::string filename, std::vector<ground_truth>& gt) {
     double x, y, azimuth;
 
     // Declare single ground truth
-    ground_truth single_gt; 
+    ground_truth single_gt;
 
     //read data from line to values
     iss_pos >> x;
@@ -211,7 +211,7 @@ inline bool read_gt_data(std::string filename, std::vector<ground_truth>& gt) {
  * @param filename Name of file containing landmark observation measurements.
  * @output True if opening and reading file was successful
  */
-inline bool read_landmark_data(std::string filename, 
+inline bool read_landmark_data(std::string filename,
                                std::vector<LandmarkObs>& observations) {
   // Get file of landmark measurements
   std::ifstream in_file_obs(filename.c_str(),std::ifstream::in);
@@ -246,6 +246,27 @@ inline bool read_landmark_data(std::string filename,
     observations.push_back(meas);
   }
   return true;
+}
+
+/**
+ * Transforms observations from vehicle's coodinates to map coordinates
+ * @param particle Particle wrt which we should transform the observation
+ * @param observation Observation in the vehicle's coordinates
+ * @output transformed The coodinates in the map
+ */
+inline LandmarkObs transform_obs(double x, double y, double theta, LandmarkObs observation) {
+  // Transform the x and y coordinates
+  double x_map, y_map;
+  x_map = x + (cos(theta) * observation.x) - (sin(theta) * observation.y);
+  y_map = y + (sin(theta) * observation.x) + (cos(theta) * observation.y);
+
+  // Create new LandmarkObs to hold transformed observation
+  LandmarkObs transformed_obs;
+  transformed_obs.id = observation.id;
+  transformed_obs.x = x_map;
+  transformed_obs.y = y_map;
+
+  return transformed_obs;
 }
 
 #endif  // HELPER_FUNCTIONS_H_
