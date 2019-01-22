@@ -80,10 +80,11 @@ void ParticleFilter::prediction(double delta_t, double std_pos[],
    *  http://en.cppreference.com/w/cpp/numeric/random/normal_distribution
    *  http://www.cplusplus.com/reference/random/default_random_engine/
    */
-   double std_x, std_y, std_theta;  // Standard deviations for x, y, and std_theta
-   std_x = std_pos[0];
-   std_y = std_pos[1];
-   std_theta = std_pos[2];
+
+   // Standard deviations for x, y, and std_theta
+   double std_x = std_pos[0];
+   double std_y = std_pos[1];
+   double std_theta = std_pos[2];
 
    std::default_random_engine gen;
 
@@ -104,8 +105,8 @@ void ParticleFilter::prediction(double delta_t, double std_pos[],
      double theta0 = particles[i].theta;
 
      if (fabs(yaw_rate) < 0.00001) {
-       xf = velocity * delta_t * cos(theta0);
-       yf = velocity * delta_t * sin(theta0);
+       xf = x0 + velocity * delta_t * cos(theta0);
+       yf = y0 + velocity * delta_t * sin(theta0);
      } else {
        xf = x0 + (velocity / yaw_rate) * (sin(theta0 + yaw_rate * delta_t) - sin(theta0));
        yf = y0 + (velocity / yaw_rate) * (cos(theta0) - cos(theta0 + yaw_rate * delta_t));
